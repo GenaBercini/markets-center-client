@@ -2,11 +2,11 @@ import axios from 'axios';
 
 import {SET_ALERT, ERRORS, MESSAGE, POST_ORDER, ADD_ORDER_CAR, DELETE_ORDER_CAR, PAYMENT, UDPATE_ORDER} from './ctes';
 
-export function postOrder(order, currentUser) {
+export function postOrder(currentUser) {
     const token = currentUser.auth.currentUser.accessToken
     return async function (dispatch) {
         try {
-            const newOrder = await axios.post('/api/private/addOrder', order, {
+            const newOrder = await axios.post('/api/private/addOrder', {idUser: currentUser.uid}, {
                 headers:{
                     Authorization: `Bearer ${token}`
                   }
@@ -37,11 +37,11 @@ export function getOrderById (id, currentUser) {
     }
 }
 
-export function addOrderCar (item) {
-    return {   
-        type: ADD_ORDER_CAR,
-        payload: item
-    } 
+// export function addOrderCar (item) {
+//     return {   
+//         type: ADD_ORDER_CAR,
+//         payload: item
+//     } 
     // async function (dispatch){
     //     try {
     //         const orderCar = await axios.get(``);
@@ -51,12 +51,12 @@ export function addOrderCar (item) {
     //         dispatch({type: ERRORS, payload: err.msg})
     //     }
     // }
-}
-export function deleteOrderCar (id) {
-    return {   
-        type: DELETE_ORDER_CAR,
-        payload: id
-    } 
+// }
+// export function deleteOrderCar (id) {
+//     return {   
+//         type: DELETE_ORDER_CAR,
+//         payload: id
+//     } 
     // async function (dispatch){
     //     try {
     //         const orderCar = await axios.get(``);
@@ -66,7 +66,7 @@ export function deleteOrderCar (id) {
     //         dispatch({type: ERRORS, payload: err.msg})
     //     }
     // }
-}
+// }
 
 export function payment(data){
     return {
@@ -75,11 +75,11 @@ export function payment(data){
     }
 }
 
-export function UpdateOrder(cart, currentUser) {
+export function UpdateOrder(cart, status, currentUser) {
     const token = currentUser.auth.currentUser.accessToken
     return async function (dispatch) {
         try {
-            const response = await axios.put(`api/private/updateOrder`, cart, {
+            const response = await axios.put(`api/private/updateOrder`, {idOrder: cart._id, status: status}, {
                 headers:{
                     Authorization: `Bearer ${token}`
                   }

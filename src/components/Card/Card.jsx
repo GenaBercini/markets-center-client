@@ -19,7 +19,7 @@ import Favorite from '@mui/icons-material/Favorite';
 import {useAuth} from '../../context/AuthContext';
 import { getOrUpdateCart } from '../../redux/actions/a.cart.js';
 
-const style = {
+/* const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
@@ -30,7 +30,7 @@ const style = {
     borderRadius: '10px',
     boxShadow: 24,
     p: 4,
-};
+}; */
 
 
 export default function Card({ name, price, image, description, stock, category, id, rating, numReviews, isFav, reviews }) { //deberia recibir props para renderizar segun los productos
@@ -77,12 +77,12 @@ export default function Card({ name, price, image, description, stock, category,
             const oldProducts = dataCarUser.products.map((old) => {
                 return {
                     productId: old.productId._id,
-                    quantity: 1,
+                    quantity: old.quantity
                 }
             })
             const newAmount = objCarTemp.reduce((sum, value) => sum+value.amount, 0);
             const obj = {
-                idUser: currentUser._delegate.uid,
+                idUser: idCarUser,
                 products: [...oldProducts, ...objCarTemp],
                 amount: dataCarUser.amount + newAmount
             }
@@ -114,28 +114,34 @@ export default function Card({ name, price, image, description, stock, category,
 
     useEffect(() => {
         if(currentUser) return dispatch(getOrUpdateCart({idUser: idCarUser}, currentUser));
-        else return false
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
         if(currentUser){
             const objTemp = JSON.parse(localStorage.getItem("productsTemp"));
             if(objTemp.length){
+                const productsUser = dataCarUser && dataCarUser.products?.map((pu) => {
+                    return {
+                        productId: pu.productId._id,
+                        quantity: pu.quantity
+                    }
+                })
+                const newAmount = objTemp.reduce((sum, value) => sum+value.amount, 0);
                 dispatch(getOrUpdateCart({
                     idUser: idCarUser,
-                    products: objTemp,
-                    amount: objTemp.reduce((sum, value) => sum+value.amount, 0)
+                    products: [...productsUser, ...objTemp],
+                    amount: dataCarUser.amount + newAmount
                 }, currentUser));
                 setProductsTemp([]);
             }
-        }else{
-            return false
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
+    
     return (
         <div onMouseEnter={moreInfo} onMouseLeave={lessInfo} className={s.container}>
-            <div>{favorito?<Button onClick={delFavs}><Favorite  color="primary"/></Button>:<Button onClick={addFavs}><FavoriteBorder  color="primary"/></Button>}</div>
+            <div>{favorito?<IconButton onClick={delFavs}><Favorite  color="primary"/></IconButton>:<IconButton onClick={addFavs}><FavoriteBorder  color="primary"/></IconButton>}</div>
             <div className={s.img}>
                 {stock > 0 ? <img src={image} width="200px" height="200px" alt="producto" /> :
                     <img src={image} width="200px" height="200px" alt="producto" className={s.sinStock} />}
@@ -183,7 +189,7 @@ export default function Card({ name, price, image, description, stock, category,
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
-                    <Box sx={style}>
+                    <Box className={s.detail} /* sx={style} */>
                         <Detail viewRev={false} name={name} price={price} image={image} stock={stock} description={description} category={category} id={id} rating={rating} numReviews={numReviews} reviews={reviews}/>
                     </Box>
                 </Modal>
