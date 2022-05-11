@@ -1,26 +1,33 @@
-import React, {useEffect, useState} from "react";
-import {useAuth} from '../../context/AuthContext';
-import {userHistory} from '../../redux/actions/a.users';
-import {useDispatch, useSelector} from 'react-redux';
-import { Typography, Container, List, DialogActions, Button } from "@mui/material";
-import {Dialog, DialogTitle, DialogContent, DialogContentText} from '@mui/material';
-import {Box, IconButton} from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { useAuth } from '../../context/AuthContext';
+import { userHistory } from '../../redux/actions/a.users';
+import { useDispatch, useSelector } from 'react-redux';
+import { Typography, Container, List, DialogActions, Button, Modal } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import HistoryItems from './HistoryItems';
 import logo from '../../images/MarketsCenter.png'
 import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import Detail from '../Card/Detail/Detail'
+import style from './Style/HistoryItems.module.css'
+import Loading from '../Loading/Loading'
+import { SnackbarAlert } from "../Alert/success";
+import { Snackbar } from "@material-ui/core";
+import { delAlert } from "../../redux/actions/a.alert";
 
 function UserProfile() {
   const dispatch = useDispatch();
   const history = useSelector((state) => state.history);
+  const loading = useSelector((state) => state.loading);
+  const alert = useSelector(state => state.alert)
   const { oneUser, currentUser } = useAuth();
   const [openMore, setOpenMore] = useState(false);
   const [openProd, setOpenProd] = useState(false);
-  const [oneProduct, setOneProduct] = useState({name:"", price:0, image:"", description:"", stock:"", category:"", id:"", rating:"", numReviews:""});
+  const [oneProduct, setOneProduct] = useState({ name: "", price: 0, image: "", description: "", stock: "", category: "", id: "", rating: "", numReviews: "", reviews: [] });
   // const [delMsg, setDelMsg] = useState('');
   // const [openDelete, setOpenDelete] = useState(false);
   const [detail, setDetail] = useState("");
-  function handleOpenMore(items){
+  function handleOpenMore(items) {
     setDetail(items.products)
     setOpenMore(true)
   }
@@ -31,6 +38,9 @@ function UserProfile() {
     setOpenProd(true)
   }
 
+  function handleClose() {
+    dispatch(delAlert())
+  }
   // function handleOpenCancel(item){
   //   if(item.status === 'Pendiente') {
   //     setDelMsg('Su orden será cancelada. Recibirá un aviso por mail')
@@ -49,7 +59,7 @@ function UserProfile() {
   }, [dispatch, oneUser._id]);
   return (
     <div>
-      <Container maxWidth="md">
+      <Container maxWidth="md" className={style.containerHistory}>
         <Typography
           sx={{ mt: 4, mb: 2, display: "block" }}
           variant="h4"
@@ -57,8 +67,15 @@ function UserProfile() {
         >
           Historial de Compras
         </Typography>
-        <List sx={{ display: "block" }} dense={false}>
-          {!history.length ? (
+         <List sx={{ display: "block" }} dense={false}>
+        {history.length>0 ? (
+            <>{history.map((item) => <HistoryItems
+                handleOpenMore={handleOpenMore}
+                key={item._id}
+                item={item}
+              />
+            )}</>
+          ): (
             <Typography
               sx={{ mt: 4, mb: 2, display: "block" }}
               variant="h4"
@@ -67,15 +84,7 @@ function UserProfile() {
             >
               Historial de compras vacío
             </Typography>
-          ) : (
-            history.map((item) => (
-              <HistoryItems
-                handleOpenMore={handleOpenMore}
-                key={item._id}
-                item={item}
-              />
-            ))
-          )}
+          ) }
         </List>
       </Container>
 
@@ -105,17 +114,7 @@ function UserProfile() {
                 sx={{ display: "block" }}
                 id="alert-dialog-description"
               >
-                <Container
-                  sx={{
-                    height: "60px",
-                    width: "400px",
-                    margin: "5px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    borderRadius: "10px",
-                  }}
-                >
+                <Container className={style.containerItem}>
                   <Box
                     sx={{
                       height: "max-content",
@@ -178,19 +177,24 @@ function UserProfile() {
         </DialogActions>
       </Dialog>
 
-      <Dialog
+      <Modal
         open={openProd}
         onClose={handleCloseProd}
-        PaperProps={{
-          sx: {
-            minWidth: 900,
-            minHeight: 450
-          }
-        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
       >
-        <Detail viewRev={true} name={oneProduct.name} price={oneProduct.price} image={oneProduct.image} description={oneProduct.description} stock={oneProduct.stock} category={oneProduct.category} id={oneProduct._id} rating={oneProduct.rating} numReviews={oneProduct.numReviews} />
-      </Dialog>
-
+        <Box className={style.cardDetalle}>
+          <Detail viewRev={true} name={oneProduct.name} price={oneProduct.price} image={oneProduct.image} description={oneProduct.description} stock={oneProduct.stock} category={oneProduct.category} id={oneProduct._id} rating={oneProduct.rating} numReviews={oneProduct.numReviews} reviews={oneProduct.reviews} onClose={handleCloseProd} />
+        </Box>
+      </Modal>
+      <Snackbar open={!!alert} autoHideDuration={1500} onClose={handleClose} anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right'
+      }}>
+        <SnackbarAlert onClose={handleClose} color='primary' variant='filled' severity='success'>
+          {alert}
+        </SnackbarAlert>
+      </Snackbar>
     </div>
   );
 }

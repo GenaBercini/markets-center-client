@@ -8,7 +8,7 @@ import CheckoutComp from "../../components/Checkout2/CheckoutComp"
 import {Snackbar} from '@mui/material';
 import {SnackbarAlert} from '../../components/Alert/success';
 import accounting from 'accounting';
-import { getOrUpdateCart } from "../../redux/actions/a.cart.js";
+import { getOrUpdateCart} from "../../redux/actions/a.cart.js";
 import { useAuth } from "../../context/AuthContext";
 import useLocalStorage from "../../pages/Carrito/useLocalStorage.js";
 import { useNavigate } from "react-router-dom";
@@ -40,8 +40,10 @@ export default function Carrito() {
 
   const productsApi = useSelector((state) => state.addOrdercar);
   const idCarUser = currentUser && currentUser.uid;
-  const [productsTemp, setProductsTemp] = useLocalStorage("productsTemp");
-  const [activePay, setActivePay] = useState(false);
+
+  const [productsTemp, setProductsTemp] = useLocalStorage('productsTemp','');
+  
+  const [activePay, setActivePay] = useState(true);
 
   const eventClickCountAdd = (price, id, counter) => {
     if (currentUser) {
@@ -61,6 +63,7 @@ export default function Carrito() {
         amount: newAmount + price 
       };
       dispatch(getOrUpdateCart(obj, currentUser));
+      
     } else {
       const getProductsTemp = JSON.parse(localStorage.getItem("productsTemp"));
       const updateTemp = getProductsTemp.map((p) => {
@@ -121,12 +124,13 @@ export default function Carrito() {
         }, 0)
       };
       dispatch(getOrUpdateCart(obj, currentUser));
+      if(!removeItem.length)setActivePay(true)
     } else {
-      if(!productsApi.products.length)setActivePay(true)
       const getProductsTemp = JSON.parse(localStorage.getItem("productsTemp"));
       const filter = getProductsTemp.filter((f) => f.productId !== id);
       setProductsTemp(filter);
       handleOpenAlert("Producto eliminado");
+      if(!filter.length)setActivePay(true)
     }
   }
 
@@ -142,6 +146,7 @@ export default function Carrito() {
       const getProductsTemp = JSON.parse(localStorage.getItem("productsTemp"));
       if (getProductsTemp.length) setProductsTemp([]);
     }
+    setActivePay(true)
   };
 
   const handleValidate = () => {
@@ -149,34 +154,72 @@ export default function Carrito() {
   };
 
   const getProductsTemp = JSON.parse(localStorage.getItem("productsTemp"));
-  const total = getProductsTemp.reduce((sum, item) => sum + item.amount, 0);
+  const totalTemp = getProductsTemp.reduce((sum, item) => sum + item.amount, 0);
   const totalApi = productsApi && productsApi.amount;
-  const subTotalApi = totalApi / 1.18;
-  const ivaApi = totalApi - subTotalApi;
-  const subTotal = total / 1.18;
-  const iva = total - subTotal;
+  const [total, setTotal] = useState(0);
+  const [subTotal, setSubTotal] = useState(0);
+  const [iva, setIva] = useState(0);
 
   useEffect(() => {
-    return currentUser && dispatch(getOrUpdateCart({ idUser: idCarUser }, currentUser));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    
+    if(currentUser){
+      productsApi.products?.length && setActivePay(false)
+      let sub = total / 1.18;
+      let i = total - subTotal;
+      setSubTotal(sub);
+      setIva(i);
+      setTotal(totalApi);
+    }else{
+      const temp = JSON.parse(localStorage.getItem("productsTemp"));
+      temp?.length && setActivePay(false);
+      let sub = totalTemp / 1.18;
+      let i = totalTemp - subTotal;
+      setSubTotal(sub);
+      setIva(i);
+      setTotal(totalTemp);
+    }
+
+  }, [total,totalApi, getProductsTemp,productsApi])
 
   return (
     <div>
       <NavBar searchBar1={false} />
-      <div className="car-container">
-        <div className="items-content">
-        {!currentUser ? (
-            productsTemp.length ? (
-              productsTemp.map((item) => {
+      <div className="supreme-container">
+        <div className="car-container">
+          <div className="items-content">
+          {!currentUser ? (
+              productsTemp.length ? (
+                productsTemp.map((item) => {
+                  return (
+                    <div key={item.productId}>
+                      <CardItem
+                        id={item.productId}
+                        name={item.name}
+                        image={item.image}
+                        price={item.price}
+                        stock={item.stock}
+                        quantity={item.quantity}
+                        eventClickCountAdd={eventClickCountAdd}
+                        eventClickCountRes={eventClickCountRes}
+                        eventClickRemoveItem={eventClickRemoveItem}
+                      />
+                      <Divider />
+                    </div>
+                  );
+                })
+              ) : (
+                <CarLoader/>
+              )
+            ) : productsApi.products?.length ? (
+              productsApi.products.map((item) => {
                 return (
-                  <div key={item.productId}>
+                  <div key={item.productId._id}>
                     <CardItem
-                      id={item.productId}
-                      name={item.name}
-                      image={item.image}
-                      price={item.price}
-                      stock={item.stock}
+                      id={item.productId._id}
+                      name={item.productId.name}
+                      image={item.productId.image}
+                      price={item.productId.price}
+                      stock={item.productId.stock}
                       quantity={item.quantity}
                       eventClickCountAdd={eventClickCountAdd}
                       eventClickCountRes={eventClickCountRes}
@@ -187,62 +230,40 @@ export default function Carrito() {
                 );
               })
             ) : (
-              <CarLoader msg={"Tu carrito esta vacío...!!!"} />
-            )
-          ) : productsApi.products?.length ? (
-            productsApi.products.map((item) => {
-              return (
-                <div key={item.productId._id}>
-                  <CardItem
-                    id={item.productId._id}
-                    name={item.productId.name}
-                    image={item.productId.image}
-                    price={item.productId.price}
-                    stock={item.productId.stock}
-                    quantity={item.quantity}
-                    eventClickCountAdd={eventClickCountAdd}
-                    eventClickCountRes={eventClickCountRes}
-                    eventClickRemoveItem={eventClickRemoveItem}
-                  />
-                  <Divider />
-                </div>
-              );
-            })
-          ) : (
-            <CarLoader msg={"Tu carrito esta vacío...!!!"} />
-          )}
-        </div>
-        <div className="pay-container">
-          <div className="content-pay tittle-pay">
-            <div className="lb-content">
-              <Typography variant="body1">Sub Total:</Typography>
-              <Typography variant="body1">Iva:</Typography>
-              <Typography variant="body1">Total:</Typography>
-            </div>
-            <div className="lb-content">
-              <Typography variant="body2">
-                {accounting.formatMoney(subTotal||subTotalApi, "$")}
-              </Typography>
-              <Typography variant="body2">
-                {accounting.formatMoney(iva||ivaApi, "$")}
-              </Typography>
-              <Typography variant="body2">
-                {accounting.formatMoney(total||totalApi, "$")}
-              </Typography>
-            </div>
+              <CarLoader/>
+            )}
           </div>
-          <hr />
-          <div className="content-pay btn-pay">
-            <Button variant="outlined" size="small"
-            disabled={activePay} 
-            onClick={currentUser ? handleOpen : handleValidate}>
-              PAGAR
-            </Button>
-          </div>
-          <div className="content-pay btn-pay">
-            <label htmlFor="" className="lbl-removeAllCar" onClick={removeAllCar}>
-              Vaciar el Carrito
-            </label>
+          <div className="pay-container">
+            <div className="content-pay tittle-pay">
+              <div className="lb-content">
+                <Typography variant="caption">Sub Total:</Typography>
+                <Typography variant="caption">Iva:</Typography>
+                <Typography variant="h5" sx={{marginTop: '10px'}}>Total:</Typography>
+              </div>
+              <div className="lb-content">
+                <Typography variant="caption">
+                  {accounting.formatMoney(subTotal, "$")}
+                </Typography>
+                <Typography variant="caption">
+                  {accounting.formatMoney(iva, "$")}
+                </Typography>
+                <Typography variant="h5"  sx={{marginTop: '10px'}} >
+                  {accounting.formatMoney(total, "$")}
+                </Typography>
+              </div>
+            </div>
+
+            <div className="content-pay btn-pay">
+              <Button variant="contained" size="small" color='buttonGracias' disableElevation  disabled={activePay}  
+                onClick={currentUser ? handleOpen : handleValidate} className="btn-pagar">
+                PAGAR
+              </Button>
+            </div>
+            <div className="content-pay btn-empty">
+              <label htmlFor="" className="lbl-removeAllCar" onClick={()=>removeAllCar()}>
+                Vaciar el Carrito
+              </label>
+            </div>
           </div>
         </div>
       </div>

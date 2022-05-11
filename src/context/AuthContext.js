@@ -35,8 +35,8 @@ export function AuthProvider({ children }) {
           }
         })
       }).then(userDB => {
-        localStorage.setItem('isAdmin', userDB.data.data[0].isAdmin)
-        localStorage.setItem('isSeller', userDB.data.data[0].isSeller)
+        localStorage.setItem('isAdmin', userDB.data.data.isAdmin)
+        localStorage.setItem('isSeller', userDB.data.data.isSeller)
         return userDB
       })
   }

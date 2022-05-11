@@ -7,6 +7,7 @@ import style from './Style/User.module.css'
 
 import { Container, Box, Button, styled, Typography, TextField } from "@mui/material";
 import { AddAPhoto } from "@mui/icons-material/";
+import CancelIcon from '@mui/icons-material/Cancel';
  
 
   const Input = styled("input")({
@@ -35,7 +36,6 @@ function UserForm({name, email, image, IdDocument, phone, address, userId, handl
 
     function handleSubmit(e){
         e.preventDefault();
-        console.log(email, state.email)
         if(email !== state.email) {
           updateEmail(state.email)
         }
@@ -47,6 +47,7 @@ function UserForm({name, email, image, IdDocument, phone, address, userId, handl
   return (
     <div>
       <Container component="main" maxWidth="md">
+        <CancelIcon color="secondary" className={style.x} onClick={handleClose} />
           <Box className={style.boxForm}>
             <Typography component="h1" variant="h5">
             Datos de Usuario

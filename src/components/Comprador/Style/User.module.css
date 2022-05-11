@@ -52,8 +52,13 @@
     align-items: center;
 }
 
+.boxName {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
 .title {
-    width: 100px !important;
+    width: 200px !important;
     height: 200px;
     display: flex !important;
     flex-direction: column;
@@ -68,14 +73,24 @@
     margin-bottom: 34px;
 }
 
+.x {
+    position: absolute;
+    top: 30px !important;
+    right: 30px;
+}
+
+
 @media all and (max-width: 500px) {
     .containerForm{
-        width: 350px;
+        width: 80% !important;
+        height: 80% !important;
+        display: flex;
+        align-items: center;
     }
 
     .containerPass {
-        width: 350px;
-        height: 500px;
+        width: 80%;
+        height: 70%;
     }
 
     .formPass {
@@ -87,13 +102,19 @@
         justify-content: center !important;
         align-items: center !important;
         padding: 0 !important;
+        flex-direction: column;
     }
 
     .containerPic {
-        display: flex;
+        display: flex !important;
+        flex-direction: column;
         justify-content: space-between;
         align-items: center;
         padding: 0;
+    }
+
+    .containerPic img {
+        border-radius: 50%;
     }
 
     .btnPic{
@@ -108,17 +129,19 @@
         display: flex !important;
         align-items: center;
         justify-content: space-between;
+        padding: 0 !important;
+        flex-direction: column;
     }
 
     .containerInfo {
-        height: 230px;
+        height: 150px;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
     }
 
-    .title h3 {
-        font-size: 30px;
+    .title h6 {
+        font-size: 25px;
     }
 
     .botones button {
@@ -127,7 +150,35 @@
         line-height: 1.5;
     }
 
-    .title {
-        width: initial !important;
+    .botones {
+        height: inherit !important;
+        margin: 16px 0 !important;
     }
+
+    .title {
+        width: 100% !important;
+        padding: 0 !important;
+        margin-top: 10px !important;
+        flex-direction: row-reverse;
+        justify-content: space-evenly;
+    }
+
+    .title img {
+        width: 120px !important;
+        height: 120px !important;
+    }
+
+    .boxName {
+        margin: 5px !important;
+    }
+
+    .x {
+        top: 20px;
+        right: 20px;
+    }
+    /* .back {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    } */
 }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import {SET_ALERT, ERRORS, MESSAGE, POST_ORDER, ADD_ORDER_CAR, DELETE_ORDER_CAR, PAYMENT, UDPATE_ORDER} from './ctes';
+import {UPDATE_DISPATCH, SET_ALERT, ERRORS, MESSAGE, POST_ORDER, ADD_ORDER_CAR, DELETE_ORDER_CAR, PAYMENT, UDPATE_ORDER} from './ctes';
 
 export function postOrder(currentUser) {
     const token = currentUser.auth.currentUser.accessToken
@@ -85,6 +85,23 @@ export function UpdateOrder(cart, status, currentUser) {
                   }
             });
             dispatch({ type: UDPATE_ORDER, payload: response.data.data })
+        } catch (err) {
+            dispatch({ type: ERRORS, payload: err.msg })
+        }
+
+    }
+}
+
+export function updateDispatches(data, currentUser) {
+    const token = currentUser.auth.currentUser.accessToken
+    return async function (dispatch) {
+        try {
+            const response = await axios.put(`api/private/updateDispatches`, data, {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                  }
+            });
+            dispatch({ type: UPDATE_DISPATCH, payload: response.data.data })
         } catch (err) {
             dispatch({ type: ERRORS, payload: err.msg })
         }

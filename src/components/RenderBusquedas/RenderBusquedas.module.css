@@ -24,3 +24,18 @@
     width: 61vw;
 
 }
+@media (max-width: 500px){
+    .container{
+        width: 90vw;
+    } 
+    .productsContainer{
+        align-items: flex-start;
+        width: 100vw
+    }
+    .container2{
+        width: 100vw;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+    } 
+}

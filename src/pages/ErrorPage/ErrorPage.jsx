@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import s from './ErrorPage.module.css'
 import Typography from '@mui/material/Typography';
 import Mc from '../../images/MarketsCenter.png';
 import Button from '@mui/material/Button';
+import { useAuth } from '../../context/AuthContext';
+import { useDispatch, useSelector } from "react-redux";
+import {UpdateOrder} from '../../redux/actions/a.order';
 
 function ErrorPage() {
     const [checked,setChecked] = useState(false);
+    const {currentUser} = useAuth();
+    const dispatch = useDispatch()
+    const newOrder = useSelector(state=> state.newOrder)
+    useEffect(()=>{
+        dispatch(UpdateOrder(newOrder, "Rechazada", currentUser))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[])
 
 
     setTimeout(function(){
@@ -24,17 +34,20 @@ function ErrorPage() {
                 </svg>
             </div>    
                 {checked?<div>
+                    <div>
                     <Typography variant="h3" className={s.title}>¡Error!</Typography>
                     <Typography variant="h6" className={s.text}>
                         Hubo un problema con el pago
                     </Typography>
-                    </div>:<div className={s.invisible} />}
-                    <div className={s.containerButton} style={{marginTop: '180px'}}>
-                        <div className={s.button}><Button variant="contained" color="buttonGracias" size="small" disableElevation href="/">Volver</Button></div>
-                        <Typography variant="body2" className={s.textMarket}>
-                            Equipo de MarketsCenter<img src={Mc} width="25px" alt="mc" className={s.imgCarritoThanks}/>
-                        </Typography>
                     </div>
+                    <div className={s.containerButton} style={{marginTop: '180px'}}>
+                    <div className={s.button}><Button variant="contained" color="buttonGracias" size="small" disableElevation href="/">Volver</Button></div>
+                    <Typography variant="body2" className={s.textMarket}>
+                        Equipo de MarketsCenter<img src={Mc} width="25px" alt="mc" className={s.imgCarritoThanks}/>
+                    </Typography>
+                </div>
+                </div>:""}
+                    
 
             </div>
            

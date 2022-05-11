@@ -142,7 +142,7 @@ export default function Vendedor(){
                                             image={producto.image}
                                             stock={producto.stock || "Sin Stock"}
                                             precio={producto.price}
-                                            category={producto.category}
+                                            category={producto.category.map(c=> c._id)}
                                             description={producto.description}
                                             banned={producto.banned}
                                             handleClose={handleClose}
@@ -160,7 +160,7 @@ export default function Vendedor(){
                 </Container>
             </Container>
         </Container>
-        <Snackbar open={!!alert} autoHideDuration={4000} onClose={handleCloseAlert} anchorOrigin={{
+        <Snackbar open={!!alert} autoHideDuration={1500} onClose={handleCloseAlert} anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right'
             }}>

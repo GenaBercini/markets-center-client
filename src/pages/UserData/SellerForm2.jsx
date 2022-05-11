@@ -69,9 +69,8 @@ export default function SellerForm2() {
             image: img,
             dateOfBirth: selectedDate
         };
-        console.log(userData);
         dispatch(postNewUser(userData, currentUser));
-        navigate('/');
+        navigate('/Bienvenido');
     }
 
     return (
