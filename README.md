@@ -25,7 +25,7 @@ As a buyer you have access to a favorites section, shopping cart, profile with y
 ## Stack of Technologies
 Javascript, React, Redux, Material UI, FireBase, Stripe
 
-### Deploy: <a href="https://markets-center.vercel.app/" target="_blank">`https://markets-center.vercel.app/`</a>
+### Deploy: [Deploy](https://markets-center.vercel.app/)
 
 ## BoilerPlate
 
